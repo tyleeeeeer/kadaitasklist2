@@ -59,9 +59,17 @@ class TasksController extends Controller
     {
         $task = new Task;
         
-        return view('tasks.create' , [
+        if(\Auth::check()){
+       
+        return view('tasks.create', [
             'task' => $task,
             ]);
+        }
+    
+
+        else {
+            return redirect('/');
+    }
     }
 
     /**
@@ -77,14 +85,21 @@ class TasksController extends Controller
             'content' => 'required|max:191',
             
         ]);
-
+        
+        $request->user()->tasks()->create([
+            'status' =>$request->status,
+            'content' =>$request->content,
+            ]);
+            
+            
+        /*
         $task = new Task;
         $task->status = $request->status;
         $task->content = $request->content;
         $task->user_id = \Auth::user()->id;
         $task->save();
         
-        
+        */
 
         return redirect('/');
     }
@@ -109,7 +124,8 @@ class TasksController extends Controller
         }
     
 
-        else {return redirect('/');
+        else {
+            return redirect('/');
     }
     
     }
@@ -124,11 +140,18 @@ class TasksController extends Controller
     {
         $task = Task::find($id);
 
+        if(\Auth::user()->id === $task->user_id){
+       
         return view('tasks.edit', [
             'task' => $task,
-        ]);
-    }
+            ]);
+        }
+    
 
+        else {
+            return redirect('/');
+    }
+    }
     /**
      * Update the specified resource in storage.
      *
@@ -166,6 +189,6 @@ class TasksController extends Controller
         
         }
 
-        return redirect('');
+        return redirect('/');
     }
 }
